@@ -101,3 +101,19 @@ li {
     margin-bottom: 15px;
     background: black;
 }
+.task-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.edit-btn {
+    background: orange;
+    color: white;
+    padding: 5px 10px;
+}
+
+.completed {
+    text-decoration: line-through;
+    opacity: 0.7;
+}

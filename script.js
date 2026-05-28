@@ -5,10 +5,11 @@ const prioritySelect = document.getElementById("priority");
 const clearBtn = document.getElementById("clearBtn");
 const darkModeBtn = document.getElementById("darkModeBtn");
 
-loadTasks();
+let tasks = loadTasks();
+
+renderTasks();
 
 addBtn.addEventListener("click", function () {
-
     const taskText = taskInput.value.trim();
     const priority = prioritySelect.value;
 
@@ -18,116 +19,133 @@ addBtn.addEventListener("click", function () {
     }
 
     const task = {
+        id: Date.now().toString(),
         text: taskText,
-        priority: priority
+        priority: priority,
+        completed: false
     };
 
-    addTask(task);
-
-    saveTask(task);
+    tasks.push(task);
+    saveTasks();
+    renderTasks();
 
     taskInput.value = "";
-
 });
 
 clearBtn.addEventListener("click", function () {
-
-    localStorage.removeItem("tasks");
-
-    taskList.innerHTML = "";
-
+    tasks = [];
+    saveTasks();
+    renderTasks();
 });
 
-function addTask(task) {
-
-    const li = document.createElement("li");
-
-    const taskSpan = document.createElement("span");
-
-    taskSpan.innerHTML =
-        `${task.text} <span class="priority">(${task.priority})</span>`;
-
-    taskSpan.addEventListener("click", function () {
-
-        if (taskSpan.style.textDecoration === "line-through") {
-            taskSpan.style.textDecoration = "none";
-        } else {
-            taskSpan.style.textDecoration = "line-through";
-        }
-
-    });
-
-    const deleteBtn = document.createElement("button");
-
-    deleteBtn.innerText = "Delete";
-
-    deleteBtn.classList.add("delete-btn");
-
-    deleteBtn.addEventListener("click", function () {
-
-        li.remove();
-
-        removeTask(task.text);
-
-    });
-
-    li.appendChild(taskSpan);
-
-    li.appendChild(deleteBtn);
-
-    taskList.appendChild(li);
-
-}
-
-function saveTask(task) {
-
-    let tasks = [];
-
-    if (localStorage.getItem("tasks")) {
-
-        tasks = JSON.parse(localStorage.getItem("tasks"));
-
+if (darkModeBtn) {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") {
+        document.body.classList.add("dark-mode");
     }
 
-    tasks.push(task);
+    darkModeBtn.addEventListener("click", function () {
+        document.body.classList.toggle("dark-mode");
 
+        if (document.body.classList.contains("dark-mode")) {
+            localStorage.setItem("theme", "dark");
+        } else {
+            localStorage.setItem("theme", "light");
+        }
+    });
+}
+
+function renderTasks() {
+    taskList.innerHTML = "";
+
+    tasks.forEach(function (task) {
+        const li = document.createElement("li");
+
+        const taskSpan = document.createElement("span");
+        taskSpan.innerHTML = `${task.text} <span class="priority">(${task.priority})</span>`;
+
+        if (task.completed) {
+            taskSpan.classList.add("completed");
+        }
+
+        taskSpan.addEventListener("click", function () {
+            task.completed = !task.completed;
+            saveTasks();
+            renderTasks();
+        });
+
+        const actions = document.createElement("div");
+        actions.classList.add("task-actions");
+
+        const editBtn = document.createElement("button");
+        editBtn.innerText = "Edit";
+        editBtn.classList.add("edit-btn");
+
+        editBtn.addEventListener("click", function () {
+            const newText = prompt("Edit your task:", task.text);
+
+            if (newText === null) return;
+
+            const trimmedText = newText.trim();
+
+            if (trimmedText === "") {
+                alert("Task cannot be empty");
+                return;
+            }
+
+            task.text = trimmedText;
+            saveTasks();
+            renderTasks();
+        });
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.innerText = "Delete";
+        deleteBtn.classList.add("delete-btn");
+
+        deleteBtn.addEventListener("click", function () {
+            tasks = tasks.filter(function (t) {
+                return t.id !== task.id;
+            });
+
+            saveTasks();
+            renderTasks();
+        });
+
+        actions.appendChild(editBtn);
+        actions.appendChild(deleteBtn);
+
+        li.appendChild(taskSpan);
+        li.appendChild(actions);
+        taskList.appendChild(li);
+    });
+}
+
+function saveTasks() {
     localStorage.setItem("tasks", JSON.stringify(tasks));
-
 }
 
 function loadTasks() {
+    const storedTasks = localStorage.getItem("tasks");
 
-    let tasks = [];
+    if (!storedTasks) return [];
 
-    if (localStorage.getItem("tasks")) {
+    const parsed = JSON.parse(storedTasks);
 
-        tasks = JSON.parse(localStorage.getItem("tasks"));
+    return parsed.map(function (task) {
+        if (typeof task === "string") {
+            return {
+                id: Date.now().toString() + Math.random(),
+                text: task,
+                priority: "Medium",
+                completed: false
+            };
+        }
 
-    }
-
-    tasks.forEach(function (task) {
-
-        addTask(task);
-
+        return {
+            id: task.id || Date.now().toString() + Math.random(),
+            text: task.text || "",
+            priority: task.priority || "Medium",
+            completed: !!task.completed
+        };
     });
-
 }
-
-function removeTask(taskToRemove) {
-
-    let tasks = JSON.parse(localStorage.getItem("tasks"));
-
-    tasks = tasks.filter(function (task) {
-
-        return task.text !== taskToRemove;
-
-    });
-
-    localStorage.setItem("tasks", JSON.stringify(tasks));
-
-}
-darkModeBtn.addEventListener("click", function () {
-
-    document.body.classList.toggle("dark-mode");
-
-});
