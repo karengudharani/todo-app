@@ -1,0 +1,25 @@
+.dark {
+  background-color: #121212;
+  min-height: 100vh;
+  color: white;
+}
+
+.dark .task-item {
+  background-color: #1e1e1e;
+}
+
+.dark .input-box {
+  background-color: #333;
+  color: white;
+  border: 1px solid gray;
+}
+
+.dark-btn {
+  margin-bottom: 20px;
+  padding: 10px 15px;
+  border: none;
+  background-color: black;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+}
