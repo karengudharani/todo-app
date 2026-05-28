@@ -1,3 +1,4 @@
+const dueDateInput = document.getElementById("dueDate");
 const addBtn = document.getElementById("addBtn");
 const taskInput = document.getElementById("taskInput");
 const taskList = document.getElementById("taskList");
@@ -19,11 +20,12 @@ addBtn.addEventListener("click", function () {
     }
 
     const task = {
-        id: Date.now().toString(),
-        text: taskText,
-        priority: priority,
-        completed: false
-    };
+    id: Date.now().toString(),
+    text: taskText,
+    priority: priority,
+    dueDate: dueDateInput.value,
+    completed: false
+};
 
     tasks.push(task);
     saveTasks();
@@ -62,8 +64,11 @@ function renderTasks() {
         const li = document.createElement("li");
 
         const taskSpan = document.createElement("span");
-        taskSpan.innerHTML = `${task.text} <span class="priority">(${task.priority})</span>`;
-
+        taskSpan.innerHTML = `
+    ${task.text}
+    <span class="priority">(${task.priority})</span>
+    <span class="due-date">${task.dueDate ? `Due: ${task.dueDate}` : ""}</span>
+`;
         if (task.completed) {
             taskSpan.classList.add("completed");
         }
@@ -82,22 +87,26 @@ function renderTasks() {
         editBtn.classList.add("edit-btn");
 
         editBtn.addEventListener("click", function () {
-            const newText = prompt("Edit your task:", task.text);
+    const newText = prompt("Edit your task:", task.text);
 
-            if (newText === null) return;
+    if (newText === null) return;
 
-            const trimmedText = newText.trim();
+    const trimmedText = newText.trim();
 
-            if (trimmedText === "") {
-                alert("Task cannot be empty");
-                return;
-            }
+    if (trimmedText === "") {
+        alert("Task cannot be empty");
+        return;
+    }
 
-            task.text = trimmedText;
-            saveTasks();
-            renderTasks();
-        });
+    const newDueDate = prompt("Edit due date (YYYY-MM-DD):", task.dueDate || "");
 
+    task.text = trimmedText;
+    task.dueDate = newDueDate ? newDueDate.trim() : "";
+
+    saveTasks();
+    renderTasks();
+    updateTaskCount();
+});
         const deleteBtn = document.createElement("button");
         deleteBtn.innerText = "Delete";
         deleteBtn.classList.add("delete-btn");
@@ -142,10 +151,11 @@ function loadTasks() {
         }
 
         return {
-            id: task.id || Date.now().toString() + Math.random(),
-            text: task.text || "",
-            priority: task.priority || "Medium",
-            completed: !!task.completed
-        };
+    id: task.id || Date.now().toString() + Math.random(),
+    text: task.text || "",
+    priority: task.priority || "Medium",
+    dueDate: task.dueDate || "",
+    completed: !!task.completed
+};
     });
 }
