@@ -1,69 +1,82 @@
 const addBtn = document.getElementById("addBtn");
-
 const taskInput = document.getElementById("taskInput");
-
 const taskList = document.getElementById("taskList");
-
+const prioritySelect = document.getElementById("priority");
+const clearBtn = document.getElementById("clearBtn");
 
 loadTasks();
 
-
 addBtn.addEventListener("click", function () {
 
-    const taskText = taskInput.value;
+    const taskText = taskInput.value.trim();
+    const priority = prioritySelect.value;
 
     if (taskText === "") {
         alert("Please enter a task");
         return;
     }
 
-    addTask(taskText);
+    const task = {
+        text: taskText,
+        priority: priority
+    };
 
-    saveTask(taskText);
+    addTask(task);
+
+    saveTask(task);
 
     taskInput.value = "";
 
 });
 
+clearBtn.addEventListener("click", function () {
 
-function addTask(taskText) {
+    localStorage.removeItem("tasks");
+
+    taskList.innerHTML = "";
+
+});
+
+function addTask(task) {
 
     const li = document.createElement("li");
 
-    li.innerText = taskText;
+    const taskSpan = document.createElement("span");
 
+    taskSpan.innerHTML =
+        `${task.text} <span class="priority">(${task.priority})</span>`;
 
-    li.addEventListener("click", function () {
+    taskSpan.addEventListener("click", function () {
 
-        li.style.textDecoration = "line-through";
+        if (taskSpan.style.textDecoration === "line-through") {
+            taskSpan.style.textDecoration = "none";
+        } else {
+            taskSpan.style.textDecoration = "line-through";
+        }
 
     });
-
 
     const deleteBtn = document.createElement("button");
 
     deleteBtn.innerText = "Delete";
 
-    deleteBtn.style.backgroundColor = "red";
-
-    deleteBtn.style.color = "white";
-
+    deleteBtn.classList.add("delete-btn");
 
     deleteBtn.addEventListener("click", function () {
 
         li.remove();
 
-        removeTask(taskText);
+        removeTask(task.text);
 
     });
 
+    li.appendChild(taskSpan);
 
     li.appendChild(deleteBtn);
 
     taskList.appendChild(li);
 
 }
-
 
 function saveTask(task) {
 
@@ -80,7 +93,6 @@ function saveTask(task) {
     localStorage.setItem("tasks", JSON.stringify(tasks));
 
 }
-
 
 function loadTasks() {
 
@@ -100,14 +112,13 @@ function loadTasks() {
 
 }
 
-
 function removeTask(taskToRemove) {
 
     let tasks = JSON.parse(localStorage.getItem("tasks"));
 
     tasks = tasks.filter(function (task) {
 
-        return task !== taskToRemove;
+        return task.text !== taskToRemove;
 
     });
 
