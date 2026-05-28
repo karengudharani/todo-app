@@ -75,3 +75,29 @@ li {
     margin-top: 15px;
     background: black;
 }
+.dark-mode {
+    background: #121212;
+}
+
+.dark-mode .container {
+    background: #1e1e1e;
+    color: white;
+}
+
+.dark-mode li {
+    background: #333;
+    color: white;
+}
+
+.dark-mode input,
+.dark-mode select {
+    background: #333;
+    color: white;
+    border: 1px solid #666;
+}
+
+#darkModeBtn {
+    width: 100%;
+    margin-bottom: 15px;
+    background: black;
+}

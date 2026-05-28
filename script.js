@@ -3,6 +3,7 @@ const taskInput = document.getElementById("taskInput");
 const taskList = document.getElementById("taskList");
 const prioritySelect = document.getElementById("priority");
 const clearBtn = document.getElementById("clearBtn");
+const darkModeBtn = document.getElementById("darkModeBtn");
 
 loadTasks();
 
@@ -125,3 +126,8 @@ function removeTask(taskToRemove) {
     localStorage.setItem("tasks", JSON.stringify(tasks));
 
 }
+darkModeBtn.addEventListener("click", function () {
+
+    document.body.classList.toggle("dark-mode");
+
+});
