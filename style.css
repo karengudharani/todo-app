@@ -128,3 +128,14 @@ li {
     margin-left: 10px;
     color: #666;
 }
+.filter-section {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.filter-section button {
+    background: #444;
+}

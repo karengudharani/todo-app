@@ -5,6 +5,10 @@ const taskList = document.getElementById("taskList");
 const prioritySelect = document.getElementById("priority");
 const clearBtn = document.getElementById("clearBtn");
 const darkModeBtn = document.getElementById("darkModeBtn");
+const allBtn = document.getElementById("allBtn");
+const pendingBtn = document.getElementById("pendingBtn");
+const completedBtn = document.getElementById("completedBtn");
+let currentFilter = "all";
 
 let tasks = loadTasks();
 
@@ -60,7 +64,13 @@ if (darkModeBtn) {
 function renderTasks() {
     taskList.innerHTML = "";
 
-    tasks.forEach(function (task) {
+    tasks
+    .filter(function (task) {
+        if (currentFilter === "pending") return !task.completed;
+        if (currentFilter === "completed") return task.completed;
+        return true;
+    })
+    .forEach(function (task) {
         const li = document.createElement("li");
 
         const taskSpan = document.createElement("span");
