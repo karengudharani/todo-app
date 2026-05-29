@@ -152,6 +152,17 @@ function renderTasks() {
 
     filteredTasks.forEach(function (task) {
         const li = document.createElement("li");
+        if (task.priority === "High") {
+    li.classList.add("high-priority");
+}
+
+if (task.priority === "Medium") {
+    li.classList.add("medium-priority");
+}
+
+if (task.priority === "Low") {
+    li.classList.add("low-priority");
+}
 
         const taskSpan = document.createElement("span");
 
