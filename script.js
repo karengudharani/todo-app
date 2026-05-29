@@ -15,6 +15,7 @@ const darkModeBtn = document.getElementById("darkModeBtn");
 const allBtn = document.getElementById("allBtn");
 const pendingBtn = document.getElementById("pendingBtn");
 const completedBtn = document.getElementById("completedBtn");
+const sortTasks = document.getElementById("sortTasks");
 
 let currentFilter = "all";
 let searchText = "";
@@ -78,6 +79,12 @@ if (searchInput) {
     });
 }
 
+if (sortTasks) {
+    sortTasks.addEventListener("change", function () {
+        renderTasks();
+    });
+}
+
 if (darkModeBtn) {
     const savedTheme = localStorage.getItem("theme");
 
@@ -100,97 +107,125 @@ function renderTasks() {
     taskList.innerHTML = "";
     updateTaskCount();
 
-    tasks
-        .filter(function (task) {
-            const matchesFilter =
-                currentFilter === "pending"
-                    ? !task.completed
-                    : currentFilter === "completed"
-                    ? task.completed
-                    : true;
+    let filteredTasks = tasks.filter(function (task) {
+        const matchesFilter =
+            currentFilter === "pending"
+                ? !task.completed
+                : currentFilter === "completed"
+                ? task.completed
+                : true;
 
-            const matchesSearch = task.text
-                .toLowerCase()
-                .includes(searchText);
+        const matchesSearch = task.text.toLowerCase().includes(searchText);
 
-            return matchesFilter && matchesSearch;
-        })
-        .forEach(function (task) {
-            const li = document.createElement("li");
+        return matchesFilter && matchesSearch;
+    });
 
-            const taskSpan = document.createElement("span");
+    if (sortTasks) {
+        const sortValue = sortTasks.value;
 
-            taskSpan.innerHTML = `
-                ${task.text}
-                <span class="priority">(${task.priority})</span>
-                <span class="category">[${task.category}]</span>
-                <span class="due-date">
-                    ${task.dueDate ? `Due: ${task.dueDate}` : ""}
-                </span>
-            `;
+        if (sortValue === "name") {
+            filteredTasks.sort(function (a, b) {
+                return a.text.localeCompare(b.text);
+            });
+        }
 
-            if (task.completed) {
-                taskSpan.classList.add("completed");
+        if (sortValue === "date") {
+            filteredTasks.sort(function (a, b) {
+                const dateA = a.dueDate || "9999-12-31";
+                const dateB = b.dueDate || "9999-12-31";
+                return dateA.localeCompare(dateB);
+            });
+        }
+
+        if (sortValue === "priority") {
+            const order = {
+                High: 1,
+                Medium: 2,
+                Low: 3
+            };
+
+            filteredTasks.sort(function (a, b) {
+                return order[a.priority] - order[b.priority];
+            });
+        }
+    }
+
+    filteredTasks.forEach(function (task) {
+        const li = document.createElement("li");
+
+        const taskSpan = document.createElement("span");
+
+        taskSpan.innerHTML = `
+            ${task.text}
+            <span class="priority">(${task.priority})</span>
+            <span class="category">[${task.category || "Study"}]</span>
+            <span class="due-date">
+                ${task.dueDate ? `Due: ${task.dueDate}` : ""}
+            </span>
+        `;
+
+        if (task.completed) {
+            taskSpan.classList.add("completed");
+        }
+
+        taskSpan.addEventListener("click", function () {
+            task.completed = !task.completed;
+            saveTasks();
+            renderTasks();
+        });
+
+        const actions = document.createElement("div");
+        actions.classList.add("task-actions");
+
+        const editBtn = document.createElement("button");
+        editBtn.innerText = "Edit";
+        editBtn.classList.add("edit-btn");
+
+        editBtn.addEventListener("click", function () {
+            const newText = prompt("Edit your task:", task.text);
+
+            if (newText === null) return;
+
+            const trimmedText = newText.trim();
+
+            if (trimmedText === "") {
+                alert("Task cannot be empty");
+                return;
             }
 
-            taskSpan.addEventListener("click", function () {
-                task.completed = !task.completed;
-                saveTasks();
-                renderTasks();
-            });
+            const newDueDate = prompt(
+                "Edit due date (YYYY-MM-DD):",
+                task.dueDate || ""
+            );
 
-            const actions = document.createElement("div");
-            actions.classList.add("task-actions");
+            task.text = trimmedText;
+            task.dueDate = newDueDate ? newDueDate.trim() : "";
 
-            const editBtn = document.createElement("button");
-            editBtn.innerText = "Edit";
-            editBtn.classList.add("edit-btn");
-
-            editBtn.addEventListener("click", function () {
-                const newText = prompt("Edit your task:", task.text);
-
-                if (newText === null) return;
-
-                const trimmedText = newText.trim();
-
-                if (trimmedText === "") {
-                    alert("Task cannot be empty");
-                    return;
-                }
-
-                const newDueDate = prompt(
-                    "Edit due date (YYYY-MM-DD):",
-                    task.dueDate || ""
-                );
-
-                task.text = trimmedText;
-                task.dueDate = newDueDate ? newDueDate.trim() : "";
-
-                saveTasks();
-                renderTasks();
-            });
-
-            const deleteBtn = document.createElement("button");
-            deleteBtn.innerText = "Delete";
-            deleteBtn.classList.add("delete-btn");
-
-            deleteBtn.addEventListener("click", function () {
-                tasks = tasks.filter(function (t) {
-                    return t.id !== task.id;
-                });
-
-                saveTasks();
-                renderTasks();
-            });
-
-            actions.appendChild(editBtn);
-            actions.appendChild(deleteBtn);
-
-            li.appendChild(taskSpan);
-            li.appendChild(actions);
-
-            taskList.appendChild(li);
+            saveTasks();
+            renderTasks();
         });
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.innerText = "Delete";
+        deleteBtn.classList.add("delete-btn");
+
+        deleteBtn.addEventListener("click", function () {
+            tasks = tasks.filter(function (t) {
+                return t.id !== task.id;
+            });
+
+            saveTasks();
+            renderTasks();
+        });
+
+        actions.appendChild(editBtn);
+        actions.appendChild(deleteBtn);
+
+        li.appendChild(taskSpan);
+        li.appendChild(actions);
+
+        taskList.appendChild(li);
+    });
 }
 
 function updateTaskCount() {
