@@ -8,6 +8,7 @@ const addBtn = document.getElementById("addBtn");
 const taskInput = document.getElementById("taskInput");
 const taskList = document.getElementById("taskList");
 const prioritySelect = document.getElementById("priority");
+const categorySelect = document.getElementById("category");
 const clearBtn = document.getElementById("clearBtn");
 const darkModeBtn = document.getElementById("darkModeBtn");
 
@@ -24,6 +25,7 @@ renderTasks();
 addBtn.addEventListener("click", function () {
     const taskText = taskInput.value.trim();
     const priority = prioritySelect.value;
+    const category = categorySelect.value;
     const dueDate = dueDateInput.value;
 
     if (taskText === "") {
@@ -35,6 +37,7 @@ addBtn.addEventListener("click", function () {
         id: Date.now().toString(),
         text: taskText,
         priority: priority,
+        category: category,
         dueDate: dueDate,
         completed: false
     };
@@ -116,9 +119,11 @@ function renderTasks() {
             const li = document.createElement("li");
 
             const taskSpan = document.createElement("span");
+
             taskSpan.innerHTML = `
                 ${task.text}
                 <span class="priority">(${task.priority})</span>
+                <span class="category">[${task.category}]</span>
                 <span class="due-date">
                     ${task.dueDate ? `Due: ${task.dueDate}` : ""}
                 </span>
@@ -183,15 +188,18 @@ function renderTasks() {
 
             li.appendChild(taskSpan);
             li.appendChild(actions);
+
             taskList.appendChild(li);
         });
 }
 
 function updateTaskCount() {
     totalCount.textContent = tasks.length;
+
     pendingCount.textContent = tasks.filter(function (task) {
         return !task.completed;
     }).length;
+
     completedCount.textContent = tasks.filter(function (task) {
         return task.completed;
     }).length;
@@ -214,6 +222,7 @@ function loadTasks() {
                 id: Date.now().toString() + Math.random(),
                 text: task,
                 priority: "Medium",
+                category: "Study",
                 dueDate: "",
                 completed: false
             };
@@ -223,6 +232,7 @@ function loadTasks() {
             id: task.id || Date.now().toString() + Math.random(),
             text: task.text || "",
             priority: task.priority || "Medium",
+            category: task.category || "Study",
             dueDate: task.dueDate || "",
             completed: !!task.completed
         };

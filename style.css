@@ -157,3 +157,9 @@ li {
     border: 1px solid gray;
     box-sizing: border-box;
 }
+.category {
+    color: #00d4ff;
+    font-size: 12px;
+    margin-left: 10px;
+    font-weight: bold;
+}
