@@ -2,6 +2,9 @@ const totalCount = document.getElementById("totalCount");
 const pendingCount = document.getElementById("pendingCount");
 const completedCount = document.getElementById("completedCount");
 
+const progressBar = document.getElementById("progressBar");
+const progressText = document.getElementById("progressText");
+
 const searchInput = document.getElementById("searchInput");
 const dueDateInput = document.getElementById("dueDate");
 const addBtn = document.getElementById("addBtn");
@@ -9,13 +12,13 @@ const taskInput = document.getElementById("taskInput");
 const taskList = document.getElementById("taskList");
 const prioritySelect = document.getElementById("priority");
 const categorySelect = document.getElementById("category");
+const sortTasks = document.getElementById("sortTasks");
 const clearBtn = document.getElementById("clearBtn");
 const darkModeBtn = document.getElementById("darkModeBtn");
 
 const allBtn = document.getElementById("allBtn");
 const pendingBtn = document.getElementById("pendingBtn");
 const completedBtn = document.getElementById("completedBtn");
-const sortTasks = document.getElementById("sortTasks");
 
 let currentFilter = "all";
 let searchText = "";
@@ -106,6 +109,7 @@ if (darkModeBtn) {
 function renderTasks() {
     taskList.innerHTML = "";
     updateTaskCount();
+    updateProgress();
 
     let filteredTasks = tasks.filter(function (task) {
         const matchesFilter =
@@ -152,17 +156,18 @@ function renderTasks() {
 
     filteredTasks.forEach(function (task) {
         const li = document.createElement("li");
+
         if (task.priority === "High") {
-    li.classList.add("high-priority");
-}
+            li.classList.add("high-priority");
+        }
 
-if (task.priority === "Medium") {
-    li.classList.add("medium-priority");
-}
+        if (task.priority === "Medium") {
+            li.classList.add("medium-priority");
+        }
 
-if (task.priority === "Low") {
-    li.classList.add("low-priority");
-}
+        if (task.priority === "Low") {
+            li.classList.add("low-priority");
+        }
 
         const taskSpan = document.createElement("span");
 
@@ -249,6 +254,23 @@ function updateTaskCount() {
     completedCount.textContent = tasks.filter(function (task) {
         return task.completed;
     }).length;
+}
+
+function updateProgress() {
+    const total = tasks.length;
+    const completed = tasks.filter(function (task) {
+        return task.completed;
+    }).length;
+
+    const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
+
+    if (progressBar) {
+        progressBar.style.width = percent + "%";
+    }
+
+    if (progressText) {
+        progressText.textContent = percent + "% Completed";
+    }
 }
 
 function saveTasks() {
