@@ -48,11 +48,12 @@ addBtn.addEventListener("click", function () {
     };
 
     tasks.push(task);
-    saveTasks();
-    renderTasks();
+saveTasks();
+renderTasks();
+showToast("Task added successfully");
 
-    taskInput.value = "";
-    dueDateInput.value = "";
+taskInput.value = "";
+dueDateInput.value = "";
 });
 
 clearBtn.addEventListener("click", function () {
@@ -187,11 +188,11 @@ function renderTasks() {
         }
 
         taskSpan.addEventListener("click", function () {
-            task.completed = !task.completed;
-            saveTasks();
-renderTasks();
-showToast("Task added successfully");
-        });
+    task.completed = !task.completed;
+    saveTasks();
+    renderTasks();
+    showToast("Task status changed");
+});
 
         const actions = document.createElement("div");
         actions.classList.add("task-actions");
