@@ -19,6 +19,7 @@ const darkModeBtn = document.getElementById("darkModeBtn");
 const allBtn = document.getElementById("allBtn");
 const pendingBtn = document.getElementById("pendingBtn");
 const completedBtn = document.getElementById("completedBtn");
+const toast = document.getElementById("toast");
 
 let currentFilter = "all";
 let searchText = "";
@@ -56,8 +57,9 @@ addBtn.addEventListener("click", function () {
 
 clearBtn.addEventListener("click", function () {
     tasks = [];
-    saveTasks();
-    renderTasks();
+saveTasks();
+renderTasks();
+showToast("All tasks cleared");
 });
 
 allBtn.addEventListener("click", function () {
@@ -187,7 +189,8 @@ function renderTasks() {
         taskSpan.addEventListener("click", function () {
             task.completed = !task.completed;
             saveTasks();
-            renderTasks();
+renderTasks();
+showToast("Task added successfully");
         });
 
         const actions = document.createElement("div");
@@ -218,7 +221,8 @@ function renderTasks() {
             task.dueDate = newDueDate ? newDueDate.trim() : "";
 
             saveTasks();
-            renderTasks();
+renderTasks();
+showToast("Task updated");
         });
 
         const deleteBtn = document.createElement("button");
@@ -230,8 +234,9 @@ function renderTasks() {
                 return t.id !== task.id;
             });
 
-            saveTasks();
-            renderTasks();
+           saveTasks();
+renderTasks();
+showToast("Task deleted");
         });
 
         actions.appendChild(editBtn);
@@ -305,4 +310,12 @@ function loadTasks() {
             completed: !!task.completed
         };
     });
+}
+function showToast(message) {
+    toast.textContent = message;
+    toast.classList.add("show");
+
+    setTimeout(function () {
+        toast.classList.remove("show");
+    }, 2000);
 }
